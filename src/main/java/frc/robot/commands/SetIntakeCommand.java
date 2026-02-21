@@ -3,7 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class SetIntakeCommand extends Command{
+public class SetIntakeCommand extends Command {
+
     private final IntakeSubsystem groundIntake;
     private final double intakeSpeed;
 
@@ -14,16 +15,17 @@ public class SetIntakeCommand extends Command{
     }
 
     @Override
-    public void initialize(){
+    public void execute(){
         groundIntake.setIntakeSpeed(intakeSpeed);
     }
 
     @Override
-    public void execute() {}
+    public void end(boolean interrupted){
+        groundIntake.setIntakeSpeed(0);
+    }
 
     @Override
     public boolean isFinished(){
-        return true;
+        return false;
     }
-    
 }
