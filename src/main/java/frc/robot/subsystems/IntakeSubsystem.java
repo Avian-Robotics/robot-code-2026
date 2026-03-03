@@ -21,7 +21,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setIntakeSpeed(double speed){
         intakeMotor.set(speed);
-        rollerMotor.set(speed);
+        rollerMotor.set(-1*speed);
     }
 
     public Command intakeInCommand(){
