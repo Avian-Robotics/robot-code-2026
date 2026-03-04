@@ -1,9 +1,8 @@
 package frc.robot;
 
-public class Constants {
+public final class Constants {
 
-    public static final class Shooter{
-
+    public static final class Shooter {
         public static final int TOP_SHOOTER_MOTOR_CAN_ID = 8;
         public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 9;
 
@@ -11,5 +10,9 @@ public class Constants {
         public static final double SHOOT_TIME_SECONDS = 15.0;
     }
 
-    
+    public static final class Intake {
+        public static final int INTAKE_SPARK_MAX_CAN_ID = 7;
+        public static final int ROLLER_SPARK_MAX_CAN_ID = 10;
+        public static final double MAX_INTAKE_SPEED = 0.65;
+    }
 }

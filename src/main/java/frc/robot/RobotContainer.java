@@ -19,15 +19,17 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.ShootCommand;
 
 public class RobotContainer {
 
-    // ---------------- Swerve Config ----------------
-    private double MaxSpeed =
+    // ================= Swerve Config =================
+
+    private final double MaxSpeed =
             1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
-    private double MaxAngularRate =
+    private final double MaxAngularRate =
             RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
     private final SwerveRequest.FieldCentric drive =
@@ -47,25 +49,33 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain =
             TunerConstants.createDrivetrain();
 
-    private final CommandXboxController joystick =
-            new CommandXboxController(0);
+    // ================= Controllers =================
 
-    // ---------------- Shooter ----------------
+    private final CommandXboxController joystick =
+            new CommandXboxController(0);   // Driver
+
+    private final CommandXboxController operatorController =
+            new CommandXboxController(1);   // Operator
+
+    // ================= Subsystems =================
+
     private final ShooterSubsystem shooterSubsystem =
             new ShooterSubsystem();
 
-    private final CommandXboxController operatorController =
-            new CommandXboxController(1);
+    private final IntakeSubsystem intakeSubsystem =
+            new IntakeSubsystem();
 
-    // ---------------- Constructor ----------------
+    // ================= Constructor =================
+
     public RobotContainer() {
         configureBindings();
     }
 
-    // ---------------- Bindings ----------------
+    // ================= Button Bindings =================
+
     private void configureBindings() {
 
-        // Default swerve command
+        // -------- Default Swerve Drive --------
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() ->
                         drive.withVelocityX(-joystick.getLeftY() * MaxSpeed)
@@ -74,21 +84,21 @@ public class RobotContainer {
                 )
         );
 
-        // Disabled idle
+        // -------- Disabled Idle --------
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        // Brake + point
+        // -------- Driver Buttons --------
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
                 point.withModuleDirection(
                         new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX())
                 )
         ));
 
-        // SysId
         joystick.back().and(joystick.y())
                 .whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         joystick.back().and(joystick.x())
@@ -103,7 +113,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // Shooter button
+        // -------- Shooter Controls (Operator) --------
         operatorController.y().onTrue(
                 new ShootCommand(
                         shooterSubsystem,
@@ -111,9 +121,17 @@ public class RobotContainer {
                         Constants.Shooter.SHOOT_TIME_SECONDS
                 )
         );
+
+        // -------- Intake Controls (Operator) --------
+        operatorController.rightTrigger()
+                .whileTrue(intakeSubsystem.intakeInCommand());
+
+        operatorController.leftTrigger()
+                .whileTrue(intakeSubsystem.intakeOutCommand());
     }
 
-    // ---------------- Autonomous ----------------
+    // ================= Autonomous =================
+
     public Command getAutonomousCommand() {
 
         final var idle = new SwerveRequest.Idle();
