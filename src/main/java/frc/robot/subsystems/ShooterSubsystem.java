@@ -19,7 +19,7 @@ public ShooterSubsystem(){
 }
 
 public void setShooterSpeed(double motorSpeed) {
-        topShooterMotor.set(motorSpeed);
+        topShooterMotor.set(-1 * motorSpeed);
         bottomShooterMotor.set(-1 * motorSpeed);
     }
 
