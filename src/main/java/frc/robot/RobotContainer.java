@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -69,43 +71,10 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem =
             new IntakeSubsystem();
 
-    // ================= Auto Chooser =================
-
-    private final SendableChooser<Command> autoChooser =
-        new SendableChooser<>();
-
     // ================= Constructor =================
 
     public RobotContainer() {
-        configureNamedCommands();
-        configureAutos();
         configureBindings();
-
-    }
-
-    // ================= PathPlanner Named Commands =================\
-
-    private void configureNamedCommands() {
-
-        NamedCommands.registerCommand(
-                "Intake", 
-                intakeSubsystem.intakeInCommand()
-        );
-
-        NamedCommands.registerCommand("Shoot", new ShootCommand(shooterSubsystem, Constants.Shooter.SHOOT_SPEED, Constants.Shooter.SHOOT_TIME_SECONDS));
-    }
-
-    // ================= Load Autos =================
-
-    private void configureAutos() {
-
-        Command leftAuto = AutoBuilder.buildAuto("Intake and Shoot Left Blue");
-        Command rightAuto = AutoBuilder.buildAuto("Intake and Shoot Right Blue");
-
-        autoChooser.setDefaultOption("Left Auto", leftAuto);
-        autoChooser.addOption("Right Auto", rightAuto);
-
-        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     // ================= Button Bindings =================
@@ -171,6 +140,13 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
-        return autoChooser.getSelected();
-    }
+        return new ParallelCommandGroup(
+        intakeSubsystem.intakeInCommand().withTimeout(10),
+        new ShootCommand(
+            shooterSubsystem,
+            Constants.Shooter.SHOOT_SPEED,
+            10
+        )
+    );
+}
 }

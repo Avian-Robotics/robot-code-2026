@@ -7,7 +7,7 @@ public final class Constants {
         public static final int BOTTOM_SHOOTER_MOTOR_CAN_ID = 9;
 
         public static final double SHOOT_SPEED = 0.95;
-        public static final double SHOOT_TIME_SECONDS = 15.0;
+        public static final double SHOOT_TIME_SECONDS = 10.0;
     }
 
     public static final class Intake {
