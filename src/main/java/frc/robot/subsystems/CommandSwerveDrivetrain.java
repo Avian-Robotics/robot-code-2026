@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 
 
 import edu.wpi.first.math.Matrix;
@@ -307,6 +308,41 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-    
-    
+    public void configureAutoBuilder() {
+
+    try {
+
+        RobotConfig config = RobotConfig.fromGUISettings();
+
+        AutoBuilder.configure(
+            () -> this.getState().Pose,
+            this::resetPose,
+            () -> this.getState().Speeds,
+
+            (speeds, feedforwards) -> this.setControl(
+                new SwerveRequest.RobotCentric()
+                    .withVelocityX(speeds.vxMetersPerSecond)
+                    .withVelocityY(speeds.vyMetersPerSecond)
+                    .withRotationalRate(speeds.omegaRadiansPerSecond)
+            ),
+
+            new PPHolonomicDriveController(
+                new PIDConstants(5.0, 0.0, 0.0),
+                new PIDConstants(5.0, 0.0, 0.0)
+            ),
+
+            config,
+
+            () -> DriverStation.getAlliance()
+                .map(alliance -> alliance == Alliance.Red)
+                .orElse(false),
+
+            this
+        );
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 }

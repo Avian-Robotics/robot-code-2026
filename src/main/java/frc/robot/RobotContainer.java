@@ -10,11 +10,10 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -58,10 +57,10 @@ public class RobotContainer {
     // ================= Controllers =================
 
     private final CommandXboxController joystick =
-            new CommandXboxController(0);   // Driver
+            new CommandXboxController(0);
 
     private final CommandXboxController operatorController =
-            new CommandXboxController(1);   // Operator
+            new CommandXboxController(1);
 
     // ================= Subsystems =================
 
@@ -71,17 +70,67 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem =
             new IntakeSubsystem();
 
+    // ================= Auto Chooser =================
+
+    private final SendableChooser<Command> autoChooser =
+            new SendableChooser<>();
+
     // ================= Constructor =================
 
     public RobotContainer() {
+
+        configureNamedCommands();
+
+        drivetrain.configureAutoBuilder();
+
+        configureAutos();
+
         configureBindings();
+    }
+
+    // ================= Named Commands (Event Markers) =================
+
+    private void configureNamedCommands() {
+
+        NamedCommands.registerCommand(
+                "Intake",
+                intakeSubsystem.intakeInCommand()
+        );
+
+        NamedCommands.registerCommand(
+                "Shoot",
+                new ShootCommand(
+                        shooterSubsystem,
+                        Constants.Shooter.SHOOT_SPEED,
+                        Constants.Shooter.SHOOT_TIME_SECONDS
+                )
+        );
+    }
+
+    // ================= Load Autos =================
+
+    private void configureAutos() {
+
+        Command leftAuto =
+                AutoBuilder.buildAuto("Intake and Shoot Left");
+
+        Command rightAuto =
+                AutoBuilder.buildAuto("Intake and Shoot Right");
+
+        autoChooser.setDefaultOption("Left Auto", leftAuto);
+        autoChooser.addOption("Right Auto", rightAuto);
+
+        Shuffleboard.getTab("Autonomous")
+                .add("Auto Selector", autoChooser)
+                .withWidget(BuiltInWidgets.kComboBoxChooser)
+                .withSize(3, 1)
+                .withPosition(0, 0);
     }
 
     // ================= Button Bindings =================
 
     private void configureBindings() {
 
-        // -------- Default Swerve Drive --------
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() ->
                         drive.withVelocityX(-joystick.getLeftY() * MaxSpeed)
@@ -90,13 +139,12 @@ public class RobotContainer {
                 )
         );
 
-        // -------- Disabled Idle --------
         final var idle = new SwerveRequest.Idle();
+
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        // -------- Driver Buttons --------
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
 
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
@@ -107,10 +155,13 @@ public class RobotContainer {
 
         joystick.back().and(joystick.y())
                 .whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+
         joystick.back().and(joystick.x())
                 .whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+
         joystick.start().and(joystick.y())
                 .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+
         joystick.start().and(joystick.x())
                 .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
@@ -119,7 +170,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // -------- Shooter Controls (Operator) --------
+        // Shooter
         operatorController.y().onTrue(
                 new ShootCommand(
                         shooterSubsystem,
@@ -128,7 +179,7 @@ public class RobotContainer {
                 )
         );
 
-        // -------- Intake Controls (Operator) --------
+        // Intake
         operatorController.rightTrigger()
                 .whileTrue(intakeSubsystem.intakeInCommand());
 
@@ -139,14 +190,6 @@ public class RobotContainer {
     // ================= Autonomous =================
 
     public Command getAutonomousCommand() {
-
-        return new ParallelCommandGroup(
-        intakeSubsystem.intakeInCommand().withTimeout(10),
-        new ShootCommand(
-            shooterSubsystem,
-            Constants.Shooter.SHOOT_SPEED,
-            10
-        )
-    );
-}
+        return autoChooser.getSelected();
+    }
 }
