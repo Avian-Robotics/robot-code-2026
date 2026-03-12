@@ -23,8 +23,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.commands.ExtendHopper;
+import frc.robot.commands.RetractHopper;
 import frc.robot.commands.ShootCommand;
 
 public class RobotContainer {
@@ -69,6 +72,9 @@ public class RobotContainer {
 
     private final IntakeSubsystem intakeSubsystem =
             new IntakeSubsystem();
+
+    private final HopperSubsystem hopperSubsystem = 
+            new HopperSubsystem();
 
     // ================= Auto Chooser =================
 
@@ -185,7 +191,12 @@ public class RobotContainer {
 
         operatorController.leftTrigger()
                 .whileTrue(intakeSubsystem.intakeOutCommand());
+        // Hopper
+        operatorController.a().onTrue(new ExtendHopper(hopperSubsystem));
+        operatorController.b().onTrue(new RetractHopper(hopperSubsystem));
     }
+        
+        
 
     // ================= Autonomous =================
 
