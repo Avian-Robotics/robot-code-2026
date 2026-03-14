@@ -124,10 +124,10 @@ public class RobotContainer {
                 AutoBuilder.buildAuto("Intake and Shoot Right");
 
         Command bulldozeDiagonal =
-                AutoBuilder.buildAuto("Left Trench Bulldoze Diagonal");
+                AutoBuilder.buildAuto("Right Trench Bulldoze Diagonal");
         
         Command bulldozeBasic =
-                AutoBuilder.buildAuto("Left Trench Bulldoze");
+                AutoBuilder.buildAuto("Right Trench Bulldoze");
 
         autoChooser.setDefaultOption("Left Auto", leftAuto);
         autoChooser.addOption("Right Auto", rightAuto);
