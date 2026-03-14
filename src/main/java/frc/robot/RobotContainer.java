@@ -79,7 +79,7 @@ public class RobotContainer {
     // ================= Auto Chooser =================
 
     private final SendableChooser<Command> autoChooser =
-            new SendableChooser<>();
+            new SendableChooser<>(); 
 
     // ================= Constructor =================
 
@@ -100,7 +100,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "Intake",
-                intakeSubsystem.intakeInCommand()
+                intakeSubsystem.intakeInCommand().withTimeout(10)
         );
 
         NamedCommands.registerCommand(
@@ -109,7 +109,7 @@ public class RobotContainer {
                         shooterSubsystem,
                         Constants.Shooter.SHOOT_SPEED,
                         Constants.Shooter.SHOOT_TIME_SECONDS
-                )
+                ).withTimeout(10)
         );
     }
 
@@ -123,8 +123,16 @@ public class RobotContainer {
         Command rightAuto =
                 AutoBuilder.buildAuto("Intake and Shoot Right");
 
+        Command bulldozeDiagonal =
+                AutoBuilder.buildAuto("Right Trench Bulldoze Diagonal");
+        
+        Command bulldozeBasic =
+                AutoBuilder.buildAuto("Right Trench Bulldoze");
+
         autoChooser.setDefaultOption("Left Auto", leftAuto);
         autoChooser.addOption("Right Auto", rightAuto);
+        autoChooser.addOption("Bulldoze Basic", bulldozeBasic);
+        autoChooser.addOption("Bulldoze Diagonal", bulldozeDiagonal);
 
         Shuffleboard.getTab("Autonomous")
                 .add("Auto Selector", autoChooser)
