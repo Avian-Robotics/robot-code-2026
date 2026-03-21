@@ -200,8 +200,8 @@ public class RobotContainer {
         operatorController.leftTrigger()
                 .whileTrue(intakeSubsystem.intakeOutCommand());
         // Hopper
-        operatorController.a().onTrue(new ExtendHopper(hopperSubsystem));
-        operatorController.b().onTrue(new RetractHopper(hopperSubsystem));
+        operatorController.povRight().onTrue(new ExtendHopper(hopperSubsystem));
+        operatorController.povLeft().onTrue(new RetractHopper(hopperSubsystem));
     }
         
         
