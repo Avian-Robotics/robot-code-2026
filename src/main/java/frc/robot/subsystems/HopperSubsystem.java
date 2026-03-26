@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class HopperSubsystem extends SubsystemBase {
 
-    private final Servo leftActuator = new Servo(0);
+    private final Servo leftActuator = new Servo(2);
     private final Servo rightActuator = new Servo(1);
 
     // positions (tune these)

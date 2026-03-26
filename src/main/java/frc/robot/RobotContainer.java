@@ -100,7 +100,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "Intake",
-                intakeSubsystem.intakeInCommand().withTimeout(10)
+                intakeSubsystem.intakeInCommand()
         );
 
         NamedCommands.registerCommand(
@@ -109,7 +109,7 @@ public class RobotContainer {
                         shooterSubsystem,
                         Constants.Shooter.SHOOT_SPEED,
                         Constants.Shooter.SHOOT_TIME_SECONDS
-                ).withTimeout(10)
+                )
         );
     }
 
