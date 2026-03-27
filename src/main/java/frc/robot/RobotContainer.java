@@ -100,7 +100,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand(
                 "Intake",
-                intakeSubsystem.intakeInCommand()
+                intakeSubsystem.intakeInCommand().withTimeout(10)
         );
 
         NamedCommands.registerCommand(
@@ -109,7 +109,7 @@ public class RobotContainer {
                         shooterSubsystem,
                         Constants.Shooter.SHOOT_SPEED,
                         Constants.Shooter.SHOOT_TIME_SECONDS
-                )
+                ).withTimeout(10)
         );
     }
 
@@ -200,8 +200,8 @@ public class RobotContainer {
         operatorController.leftTrigger()
                 .whileTrue(intakeSubsystem.intakeOutCommand());
         // Hopper
-        operatorController.povRight().onTrue(new ExtendHopper(hopperSubsystem));
-        operatorController.povLeft().onTrue(new RetractHopper(hopperSubsystem));
+        joystick.povRight().onTrue(new ExtendHopper(hopperSubsystem));
+        joystick.povLeft().onTrue(new RetractHopper(hopperSubsystem));
     }
         
         
